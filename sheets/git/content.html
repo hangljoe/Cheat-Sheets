@@ -1,0 +1,84 @@
+<div class="card span-6 t1" data-tier="2">
+    <h2><i data-icon="layers"></i>The four places your code lives</h2>
+    <figure data-excalidraw="diagrams/areas.excalidraw"></figure>
+  </div>
+
+  <div class="card t3" data-tier="2">
+    <h2><i data-icon="rocket"></i>Start</h2>
+    <dl class="kv stack">
+      <dt><code>git init</code></dt><dd>New repo in this folder</dd>
+      <dt><code>git clone url</code></dt><dd>Copy a remote repo</dd>
+      <dt><code>git status</code></dt><dd>What changed? Run it often</dd>
+      <dt><code>git config --global user.name</code></dt><dd>Set identity once</dd>
+    </dl>
+  </div>
+
+  <div class="card t2" data-tier="1">
+    <h2><i data-icon="workflow"></i>Daily loop</h2>
+    <ol class="steps">
+      <li><code>git pull</code> latest changes</li>
+      <li data-tier="2"><code>git switch -c feat/x</code> new branch</li>
+      <li><span data-tier="2">Edit, then </span><code>git add -p</code><span data-tier="2"> hunk by hunk</span></li>
+      <li><code>git commit -m "…"</code> small &amp; focused</li>
+      <li><code>git push</code><span data-tier="2"> <code>-u origin feat/x</code> → open PR</span></li>
+    </ol>
+  </div>
+
+  <div class="card t4" data-tier="1">
+    <h2><i data-icon="git-fork"></i>Branches</h2>
+    <dl class="kv">
+      <dt data-tier="3"><code>git branch</code></dt><dd data-tier="3">List local branches</dd>
+      <dt data-tier="3"><code>git switch name</code></dt><dd data-tier="3">Move to a branch</dd>
+      <dt><code>git switch -c name</code></dt><dd>Create + move</dd>
+      <dt><code>git merge feat</code></dt><dd>Bring <i>feat</i> into current</dd>
+      <dt data-tier="2"><code>git rebase main</code></dt><dd data-tier="2">Replay your commits on top of main</dd>
+      <dt data-tier="2"><code>git branch -d name</code></dt><dd data-tier="2">Delete merged branch</dd>
+    </dl>
+  </div>
+
+  <div class="card t6" data-tier="2">
+    <h2><i data-icon="undo-2"></i>Undo anything</h2>
+    <table>
+      <thead><tr><th>Situation</th><th>Command</th></tr></thead>
+      <tbody>
+        <tr><td>Discard file edits</td><td><code>git restore f</code></td></tr>
+        <tr><td>Unstage a file</td><td><code>git restore --staged f</code></td></tr>
+        <tr><td>Fix last commit msg</td><td><code>git commit --amend</code></td></tr>
+        <tr><td>Undo commit, keep work</td><td><code>git reset --soft HEAD~1</code></td></tr>
+        <tr><td>Revert a pushed commit</td><td><code>git revert &lt;sha&gt;</code></td></tr>
+        <tr data-tier="4"><td>"I lost something"</td><td><code>git reflog</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card t5" data-tier="2">
+    <h2><i data-icon="search"></i>Look around</h2>
+    <dl class="kv">
+      <dt><code>git log --oneline --graph</code></dt><dd>History as a tree</dd>
+      <dt><code>git diff</code></dt><dd>Unstaged changes</dd>
+      <dt><code>git diff --staged</code></dt><dd>What will commit</dd>
+      <dt><code>git show sha</code></dt><dd>One commit in full</dd>
+      <dt><code>git blame f</code></dt><dd>Who changed each line</dd>
+    </dl>
+  </div>
+
+  <div class="card t3" data-tier="3">
+    <h2><i data-icon="archive"></i>Stash: park work</h2>
+    <div class="flow"><span>dirty tree<small>mid-change</small></span><span><code>git stash</code></span><span>switch &amp; fix</span><span><code>git stash pop</code></span></div>
+    <p class="small muted"><code>git stash list</code> shows all parked changes; <code>-u</code> includes new files.</p>
+  </div>
+
+  <div class="card t1" data-tier="2">
+    <h2><i data-icon="git-merge"></i>Merge vs rebase</h2>
+    <div class="vs neutral">
+      <div><h4>merge</h4><ul class="dots"><li>Keeps true history</li><li>Adds merge commit</li><li>Safe on shared branches</li></ul></div>
+      <div><h4>rebase</h4><ul class="dots"><li>Linear, clean log</li><li>Rewrites SHAs</li><li>Only on <b>your</b> branches</li></ul></div>
+    </div>
+  </div>
+
+  <div class="card t6 tint" data-tier="1">
+    <h2><i data-icon="shield-alert"></i>Golden rules</h2>
+    <div class="callout danger" data-tier="2"><i data-icon="triangle-alert"></i><p><b>Never</b> force-push a shared branch.<span data-tier="2"> If you must: <code>--force-with-lease</code>.</span></p></div>
+    <div class="callout tip" data-tier="2"><i data-icon="lightbulb"></i><p><b>Commit small</b>: one idea per commit, message says <i>why</i>.</p></div>
+    <div class="callout key"><i data-icon="life-buoy"></i><p><b>Lost work?</b> <code>git reflog</code> remembers everything.</p></div>
+  </div>

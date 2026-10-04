@@ -1,0 +1,4 @@
+title: Bad
+variants:
+  ok: { format: A6, depth: 1 }
+  broken: { format: A6, depth: 1, theme: nosuchtheme }

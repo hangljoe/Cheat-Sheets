@@ -1,0 +1,5 @@
+/* studio — clean, bright, print-friendly. The default. */
+:root {
+  --paper: #fbfaf7; --ink: #1b2130; --ink-2: #5d6576; --line: #e4e0d6; --card: #ffffff;
+  --t1: #2f6fed; --t2: #f0640f; --t3: #0b9e70; --t4: #9b3fd1; --t5: #e9a100; --t6: #e0335f;
+}

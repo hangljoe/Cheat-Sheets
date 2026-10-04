@@ -1,0 +1,18 @@
+/* midnight — dark, neon accents. Best on screen and tablets; ink-heavy in print. */
+:root {
+  --paper: #0d1117; --ink: #e8edf6; --ink-2: #8d98ad; --line: #232b38; --card: #141b25;
+  --code-bg: #05080d; --code-ink: #d6e2ff;
+  --t1: #4da3ff; --t2: #ff8a3d; --t3: #2ee6a6; --t4: #c77dff; --t5: #ffd43b; --t6: #ff4d8d;
+  --shadow: 0 0 0 1px rgb(255 255 255 / 0.02), 0 0.4em 1.2em rgb(0 0 0 / 0.35);
+}
+.sheet-head { border-bottom-color: var(--t1); }
+.sheet-head h1 { background: linear-gradient(90deg, var(--t1), var(--t4) 60%, var(--t6)); -webkit-background-clip: text; color: transparent; }
+.head-icon { background: linear-gradient(135deg, var(--t1), var(--t4)); box-shadow: 0 0 1.4em rgb(77 163 255 / 0.45); }
+.card { border: 1px solid color-mix(in oklab, var(--tone) 35%, transparent); }
+.card::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 2px; border-radius: var(--radius) var(--radius) 0 0;
+  background: linear-gradient(90deg, var(--tone), transparent); }
+.card > h2 { color: color-mix(in oklab, var(--tone) 80%, white); }
+.card > h2 svg.icon { box-shadow: 0 0 0.9em color-mix(in oklab, var(--tone) 60%, transparent); color: #0d1117; }
+code { background: color-mix(in oklab, var(--tone, var(--t1)) 16%, var(--card)); color: color-mix(in oklab, var(--tone, var(--t1)) 55%, white); }
+.chip.depth { background: var(--t1); color: #0d1117; }
+.excalidraw-svg { filter: invert(1) hue-rotate(180deg); }

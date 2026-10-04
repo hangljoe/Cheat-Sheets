@@ -1,0 +1,7 @@
+title: Topic
+icon: book-open
+page_style: "--fig-max: 30mm"
+variants:
+  small: { format: A6, depth: 1 }
+  big: { format: A4, orientation: landscape, depth: 5 }
+  tight: { format: A7, depth: 5, pages: 1 }

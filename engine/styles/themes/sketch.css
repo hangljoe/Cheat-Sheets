@@ -1,0 +1,27 @@
+/* sketch — hand-drawn Excalidraw look: wobbly borders, marker headings, paper texture. */
+:root {
+  --paper: #fffdf6; --ink: #1e1e1e; --ink-2: #5b5b5b; --line: #d9d4c4; --card: #fffdf6;
+  --t1: #1971c2; --t2: #e8590c; --t3: #2f9e44; --t4: #9c36b5; --t5: #f08c00; --t6: #e03131;
+  --font-display: 'Excalifont', 'Virgil', cursive;
+  --radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --card-border: 2px solid var(--ink);
+}
+.card { box-shadow: 0.25em 0.3em 0 color-mix(in oklab, var(--tone) 35%, transparent); }
+section.page {
+  background-image: radial-gradient(rgb(0 0 0 / 0.07) 0.6px, transparent 0.6px);
+  background-size: 1.1em 1.1em;
+}
+.sheet-head { border-bottom: none; position: relative; }
+.sheet-head::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 0.5em;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 10' preserveAspectRatio='none'%3E%3Cpath d='M2 6 C 60 2, 120 9, 200 5 S 330 2, 398 6' fill='none' stroke='%231e1e1e' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat; }
+.sheet-head h1 { font-weight: 400; letter-spacing: 0; }
+.head-icon { border-radius: var(--radius); border: 2px solid var(--ink); background: var(--t5); color: var(--ink); }
+.card > h2 { font-weight: 400; font-size: 1.4em; color: var(--ink); }
+.card > h2 svg.icon { border-radius: 50% 40% 55% 45%; border: 1.5px solid var(--ink); background: color-mix(in oklab, var(--tone) 30%, var(--paper)); color: var(--ink); }
+.card > h2::after { content: ''; flex: 1; height: 0.35em; align-self: flex-end; margin-bottom: 0.2em;
+  background: color-mix(in oklab, var(--tone) 28%, transparent); border-radius: 99em; }
+.callout, .vs > *, .tiles > *, .flow > *, pre { border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px; }
+.flow > * { border: 1.5px solid var(--ink); }
+.callout { border: 1.5px solid var(--ink); border-left-width: 0.3em; border-left-color: var(--c); }
+.chip.depth { background: var(--ink); }
+.big, .stat b, .mnemonic > div > b:first-child { font-weight: 400; }
