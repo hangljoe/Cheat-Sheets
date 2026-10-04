@@ -42,6 +42,12 @@ at which it starts to appear. An A7 pocket card at depth 1 and an A4 desk sheet 
 the same file, so fixing a fact fixes every format. Pages are cut automatically, card widths are
 balanced automatically, and a few lines of Mermaid become a hand-drawn diagram.
 
+## Print
+
+Small formats print several to a sheet. Add `print: { sheet: A4 }` to a variant (or pass `--print A4`) and the
+build writes a print PDF next to the card: four A7 cards per A4 sheet with cut marks, eight without a margin,
+and front/back pairs for double-sided cards. Print at 100 %, cut along the marks.
+
 ## Themes
 
 `studio` is clean and bright for print. `sketch` is the hand-drawn Excalidraw look.

@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 // Render a cheat sheet folder to print-ready PDF + PNG previews.
 //
-//   node engine/render.mjs <slug[:variant] | path/to/sheet-dir> [--no-fit] [--no-png] [--open]
+//   node engine/render.mjs <slug[:variant] | path/to/sheet-dir> [--no-fit] [--no-png] [--open] [--print [A4|A3]]
 //
 // A sheet folder holds sheet.yaml (meta) and either content.html (a flat list of
 // cards, paginated automatically) or sheet.html (one <section class="page"> per page).
 // `variants:` in sheet.yaml builds several formats from the same content into
 // out/<slug>/<variant>/; without it, output lands in out/<slug>/. Exit codes:
 // 0 ok · 1 a build failed · 2 overflow or more pages than `pages:` · 3 text under 6 pt ·
-// 4 a figure failed. Across variants the most severe code wins, in that order (1, 2, 3, 4).
+// 4 a figure or the print sheet failed. Across variants the most severe code wins, in that order (1, 2, 3, 4).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,11 +19,19 @@ import { buildSheet, exitCodeFor, pageUnreadable, floorOverridden, readMeta, che
 import { MIN_PT } from './formats.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// Options: booleans (--no-fit --no-png --open) and --print with an optional sheet (A3|A4).
 const args = process.argv.slice(2);
-const flags = new Set(args.filter((a) => a.startsWith('--')));
-const target = args.find((a) => !a.startsWith('--'));
+const flags = new Set();
+let target, print;
+for (let i = 0; i < args.length; i++) {
+  const a = args[i];
+  if (a === '--print') {
+    print = /^A[3-7]$/i.test(args[i + 1] ?? '') ? args[++i].toUpperCase() : 'A4';
+  } else if (a.startsWith('--')) flags.add(a);
+  else if (!target) target = a;
+}
 if (!target) {
-  console.error('Usage: npm run build -- <slug[:variant]> [--no-fit] [--no-png] [--open]');
+  console.error('Usage: npm run build -- <slug[:variant]> [--no-fit] [--no-png] [--open] [--print [A4|A3]]');
   process.exit(1);
 }
 
@@ -76,7 +84,7 @@ try {
   const codes = [];
   for (const job of jobs) {
     try {
-      const report = await buildSheet({ root: ROOT, sheetDir, flags, browser, ...job });
+      const report = await buildSheet({ root: ROOT, sheetDir, flags, browser, print, ...job });
       printReport(report);
       if (flags.has('--open') && process.platform === 'darwin') execFileSync('open', [path.join(ROOT, report.pdf)]);
       codes.push(exitCodeFor(report));
@@ -121,6 +129,9 @@ function printReport(r) {
     console.log(`  note: sheet.yaml asks for ${r.requestedPages} page(s), the sheet has ${r.pages.length}.`);
   }
   console.log(`  → ${r.pdf}`);
+  if (r.print?.pdf) console.log(`  print: ${r.print.perSheet} per ${r.print.sheet} sheet, ${r.print.sheets} sheet(s)${r.print.duplex ? ' (duplex, flip on long edge)' : ''} → ${r.print.pdf}`);
+  else if (r.print?.skipped) console.log(`  print: skipped — ${r.print.skipped}`);
+  else if (r.print?.error) console.warn(`  ✗ print failed: ${r.print.error}`);
   const figureTiny = r.pages.some((p) => pageUnreadable(p) && String(p.minTextAt).startsWith('figure:'));
   if (r.figures?.errors?.length) console.log('  Fix: check the Mermaid syntax / file path of the failed figure(s) above.');
   if (overridden) console.log(`  Fix: remove the --min-text override from sheet.css (the floor is ${MIN_PT} pt).`);

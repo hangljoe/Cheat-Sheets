@@ -120,4 +120,5 @@ Iterate until every page reports `✓ fits` and looks right (usually 1–3 round
 Show the user page 1 (the PNG) and give the PDF path. One line on what was
 cut at this depth, so they know what a deeper version would add. Offer one
 variant only if natural (e.g. "A7 pocket version?"): a variant is one more line under
-`variants:` in sheet.yaml (format, depth, theme, pages) — never a copied folder.
+`variants:` in sheet.yaml (format, depth, theme, pages) — never a copied folder. For A6/A7 variants add
+`print: { sheet: A4 }` and hand over the `-print-A4.pdf` too (print at 100 %, cut along the marks).

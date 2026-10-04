@@ -9,4 +9,4 @@
 | OPEN | package.json overrides | nanoid 4→5 and lodash-es forced for npm-audit HIGHs; re-check on upgrading mermaid-to-excalidraw | s2 security |
 | OPEN | engine/client/skeleton.js | image-fallback fileIds come from nanoid → not byte-deterministic | s2 review |
 | OPEN | engine/lib/vendor.mjs | bundle staleness by mtime; a content hash of resolved versions would be stricter | s2 design |
-| OPEN | S5 plan | hook imposition inside buildSheet before report.json; render.mjs needs value options (`--print A4`); define merge for nested `print:` | s4 systems |
+| RESOLVED | S5 | imposition hooked inside buildSheet before report.json; `--print [A4|A3]` value option; print is a per-variant key (shallow merge, documented) | s4 systems |

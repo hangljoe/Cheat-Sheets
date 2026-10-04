@@ -26,4 +26,10 @@ test('demo: sheets/git builds every variant cleanly in under 60 s', () => {
     if (r.requestedPages) assert.ok(r.pages.length <= r.requestedPages, `${v} needs more pages`);
     assertReadable(r);
   }
+  // The pocket card ships with an A4 print sheet: 4 cards, cut marks.
+  const pocket = JSON.parse(fs.readFileSync(path.join(ROOT, 'out', 'git', 'pocket', 'report.json'), 'utf8'));
+  assert.equal(pocket.print.perSheet, 4);
+  assert.equal(pocket.print.placed, 4);
+  assert.ok(pocket.print.marks > 0);
+  assert.ok(fs.existsSync(path.join(ROOT, pocket.print.pdf)));
 });

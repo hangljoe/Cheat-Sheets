@@ -5,4 +5,4 @@ tags: [CLI, version control]
 version: v2 · 2026-10
 variants:
   desk: { format: A4, orientation: landscape, depth: 3, theme: studio, pages: 1 }
-  pocket: { format: A7, depth: 1, theme: sketch, title: Git in 60s, subtitle: Pocket card, tags: [], pages: 1 }
+  pocket: { format: A7, depth: 1, theme: sketch, title: Git in 60s, subtitle: Pocket card, tags: [], pages: 1, print: { sheet: A4 } }

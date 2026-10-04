@@ -7,6 +7,7 @@ import { resolveLayout, MIN_PT } from '../formats.mjs';
 import { inlineIcons } from '../icons.mjs';
 import { startServer } from './server.mjs';
 import { ensureMermaidBundle } from './vendor.mjs';
+import { impose } from './impose.mjs';
 
 // Remove every module script the engine injected (boot.js today, more later) so a
 // saved snapshot can never boot twice. Other scripts (e.g. inline Mermaid) stay.
@@ -40,6 +41,23 @@ export function safeRemove(root, dir) {
   const target = path.resolve(dir);
   if (!target.startsWith(out)) throw new Error(`refusing to delete ${target}: not inside ${out}`);
   fs.rmSync(target, { recursive: true, force: true });
+}
+
+// Impose the variant's PDF onto print sheets; never throws.
+async function printSheet({ root, outDir, name, layout, opt }) {
+  const sheetMm = resolveLayout({ format: opt.sheet, orientation: 'portrait' });
+  if (layout.widthMm * layout.heightMm >= sheetMm.widthMm * sheetMm.heightMm) {
+    return { ...opt, skipped: `${layout.format} is not smaller than ${opt.sheet}` };
+  }
+  try {
+    const r = await impose(fs.readFileSync(path.join(outDir, `${name}.pdf`)),
+      { card: [layout.widthMm, layout.heightMm], ...opt });
+    const file = path.join(outDir, `${name}-print-${opt.sheet}.pdf`);
+    fs.writeFileSync(file, r.bytes);
+    return { ...opt, perSheet: r.perSheet, placed: r.placed, sheets: r.sheets, marks: r.marks, pdf: path.relative(root, file) };
+  } catch (e) {
+    return { ...opt, error: e.message };
+  }
 }
 
 // Exit-code precedence across variants: a crash, then overflow/pages, then text, then figures.
@@ -85,7 +103,16 @@ ${body}
 
 // meta / html default to sheetDir's sheet.yaml / sheet.html; callers that build
 // variants pass their own (merged meta, generated pages) without touching disk.
-export async function buildSheet({ root, sheetDir, outDir, name, meta: metaIn, html: htmlIn, flags = new Set(), browser }) {
+// print (meta `print:` or the CLI's `--print A4`): true | 'A3' | { sheet, duplex, margin, marks }.
+// A print problem never throws: it lands in report.print.error (and exits 4).
+export function printOptions(meta, cliPrint) {
+  const raw = cliPrint ?? meta.print;
+  if (raw === undefined || raw === null || raw === false) return null;
+  const o = raw === true ? {} : typeof raw === 'string' ? { sheet: raw } : raw;
+  return { sheet: String(o.sheet || 'A4').toUpperCase(), duplex: !!o.duplex, margin: o.margin ?? 5, marks: o.marks !== false, fill: o.fill !== false };
+}
+
+export async function buildSheet({ root, sheetDir, outDir, name, meta: metaIn, html: htmlIn, flags = new Set(), browser, print: cliPrint }) {
   const meta = metaIn ?? readMeta(sheetDir);
   checkMeta(root, meta);
   const layout = resolveLayout(meta);
@@ -153,6 +180,8 @@ export async function buildSheet({ root, sheetDir, outDir, name, meta: metaIn, h
       pages, figures, iconsMissing: [...new Set(missing)],
       pdf: path.relative(root, path.join(outDir, `${name}.pdf`)),
     };
+    const printOpt = printOptions(meta, cliPrint);
+    if (printOpt) report.print = await printSheet({ root, outDir, name, layout, opt: printOpt });
     fs.writeFileSync(path.join(outDir, 'report.json'), JSON.stringify(report, null, 2));
     return report;
   } finally {
@@ -183,6 +212,6 @@ export function exitCodeFor(report) {
   if (report.pages.some((p) => p.overflow)) return 2;
   if (report.auto && report.requestedPages && report.pages.length > report.requestedPages) return 2;
   if (report.pages.some(pageUnreadable)) return 3;
-  if (report.figures?.errors?.length) return 4;
+  if (report.figures?.errors?.length || report.print?.error) return 4;
   return 0;
 }

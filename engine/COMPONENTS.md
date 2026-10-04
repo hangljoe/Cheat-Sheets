@@ -22,6 +22,21 @@ doesn't help. Variant keys override the top-level ones (shallow merge). Variant 
 digits, `-`, `_`. `layout: flow` switches a variant to newspaper columns; `balance: false` turns the
 balancer off.
 
+### Printing small cards
+
+`print:` on a variant (or `npm run build -- <slug> --print [A4|A3]`) lays its pages out several to a sheet
+with cut marks and writes `<name>-print-A4.pdf` next to the PDF:
+
+```yaml
+pocket: { format: A7, depth: 1, print: { sheet: A4 } }                 # 4 cards per A4, cut marks
+pocket: { format: A7, depth: 1, print: { sheet: A4, margin: 0 } }      # 8 per A4 (borderless printers), guides
+pocket: { format: A6, depth: 2, pages: 2, print: { duplex: true } }    # front/back pairs, flip on the long edge
+```
+
+`print: true` = A4. A card with fewer pages than a sheet has slots is repeated to fill it (`fill: false` to
+turn that off). Duplex needs an even page count; a print problem is reported in `report.print.error` and exits 4.
+Print the sheet at **100 % / actual size**, never "fit to page".
+
 Explicit pages (old style) still work: a `sheet.html` with one `<section class="page">` per page.
 A folder must not contain both.
 

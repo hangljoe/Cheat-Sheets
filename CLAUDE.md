@@ -26,14 +26,14 @@ material; Claude extracts what matters and renders DIN A3–A7 PDFs.
 
 ```bash
 npm run new -- <slug> [--format A5] [--orientation portrait] [--depth 2] [--theme sketch] [--title "…"] [--icon book] [--pages-mode]
-npm run build -- <slug>[:variant] [--open] [--no-fit] [--no-png]
+npm run build -- <slug>[:variant] [--open] [--no-fit] [--no-png] [--print [A4|A3]]
 npm test                       # unit + fixture renders (node:test)
 ```
 
 Each build writes `report.json` next to its PDF (per page: scale, effectivePt, minTextPt, overflow, fill,
 balance, cards; plus figures and pagination). Exit codes — treat every non-zero as a failing test:
 1 = a build failed or the input is invalid · 2 = a page overflows, or a variant needs more pages than
-its `pages:` · 3 = text under 6 pt (`minTextAt` names it, incl. diagram labels) · 4 = a figure failed.
+its `pages:` · 3 = text under 6 pt (`minTextAt` names it, incl. diagram labels) · 4 = a figure or the print sheet failed.
 `npm test` must stay green.
 
 ## Conventions

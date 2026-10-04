@@ -1,0 +1,4 @@
+title: Print Odd
+format: A7
+depth: 1
+print: { sheet: A4, duplex: true }
