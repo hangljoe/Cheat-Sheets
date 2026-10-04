@@ -166,8 +166,11 @@ ul.dots > li::before { content: ''; position: absolute; left: 0.3em; top: 0.48em
 ul.checks > li::before { content: '✓'; position: absolute; left: 0.1em; font-weight: 800; color: var(--t3); }
 ul.crosses > li::before { content: '✕'; position: absolute; left: 0.1em; font-weight: 800; color: var(--t6); }
 ul.arrows > li::before { content: '→'; position: absolute; left: 0.05em; font-weight: 800; color: var(--tone, var(--accent)); }
+/* Multi-column lists: `columns` is ignored on flex containers, so these switch back to block flow. */
+ul.cols-2, ul.cols-3, ol.cols-2, ol.cols-3 { display: block; }
 .cols-2 { columns: 2; column-gap: 1em; } .cols-2 > li { break-inside: avoid; }
 .cols-3 { columns: 3; column-gap: 0.8em; } .cols-3 > li { break-inside: avoid; }
+.cols-2 > li:not(:last-child), .cols-3 > li:not(:last-child) { margin-bottom: 0.3em; }
 
 /* ---------- numbered steps (vertical timeline) ---------- */
 ol.steps { list-style: none; counter-reset: s; display: flex; flex-direction: column; }
