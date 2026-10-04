@@ -1,0 +1,8 @@
+title: Extreme Ownership
+subtitle: The twelve leadership principles of Willink & Babin, on one page
+icon: shield-check
+tags: [leadership, teams]
+version: v1 · 2026-10
+source: "Willink & Babin, Extreme Ownership (2015)"
+variants:
+  desk: { format: A4, orientation: landscape, depth: 3, theme: studio, pages: 1 }
