@@ -110,6 +110,10 @@ Read every `page-N.png` and judge it as a designer would:
 - exit 3 / `✗ TEXT < 6pt` → enlarge the offending text (`minTextAt` in report.json names it). Custom
   `sheet.css` must never shrink text or `::before/::after` content below 6 pt; that content isn't measured.
 - `△ sparse` → add the next-ranked items from notes.md (lower their tier), or enlarge the diagram.
+- `△ hollow` (over 10 % of card area empty; the line names the cards) → the named cards are short next
+  to tall neighbours: add their next-ranked items, merge two short cards into one, or trim the tall
+  neighbour. In cards wider than 4 columns use blocks that stretch (tables, callouts, tiles, `.vs`,
+  `cols-2` lists), never a single-column list of short lines.
 - Visual check: collisions in diagrams, orphan arrows, cramped cards next to
   empty ones, unreadable text, monotone color, missing anchor.
 

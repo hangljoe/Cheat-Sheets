@@ -20,7 +20,10 @@ variants:
 `pages:` is a limit — the engine first re-cuts at a smaller scale, and only fails (exit 2) if that
 doesn't help. Variant keys override the top-level ones (shallow merge). Variant names: letters,
 digits, `-`, `_`. `layout: flow` switches a variant to newspaper columns; `balance: false` turns the
-balancer off.
+balancer off. The balancer picks the shortest stack whose **hollow space** (a short card stretched next
+to a tall one, as a share of all card area) stays under 10 %; `max_hollow: 0.2` relaxes that, `1` means
+shortest stack only. Every build reports `hollow` per page and `slack` per card; above the cap the CLI
+prints `△ hollow` naming the cards to fill or trim.
 
 ### Printing small cards
 

@@ -32,6 +32,31 @@ test('(e) cost budget: 31 cards skipped, 30 balanced', () => {
   assert.equal(planRows(many(MAX_BALANCE_CARDS), { cols: 3 }).spans.length, MAX_BALANCE_CARDS);
 });
 
+test('(h) hollow cap: the shortest stack under the cap wins, not the shortest stack', () => {
+  // Three free cards. Shortest stack: one row [4,4,4] at 100 px, but card 2 is only 40 px tall
+  // at span 4 → 60·4 = 240 px·span hollow = 20 % of the row's 12·100 area. Two rows [6,6] + [12]
+  // stack 100 + 20 = 120 px with no hollow space.
+  const cards = [card({ 4: 100, 6: 100, 12: 100 }), card({ 4: 100, 6: 100, 12: 100 }), card({ 4: 40, 6: 40, 12: 20 })];
+  const shortest = planRows(cards, { cols: 3, gap: 0, maxHollow: 1 });
+  assert.deepEqual(shortest.spans, [4, 4, 4]);
+  assert.equal(shortest.hollow, 0.2);
+  const capped = planRows(cards, { cols: 3, gap: 0 });          // default cap 10 %
+  assert.deepEqual(capped.spans, [6, 6, 12]);
+  assert.equal(capped.hollow, 0);
+  assert.equal(capped.height, 120);
+  assert.deepEqual(planRows(cards, { cols: 3, gap: 0, maxHollow: 0.25 }).spans, [4, 4, 4]);
+});
+
+test('(i) hollow cap: when nothing qualifies, the least hollow layout wins', () => {
+  // Every layout is hollow: card 1 is 100 px at any span, card 2 is 10 px at any span.
+  // [4,8]/[8,4]/[6,6] rows: hollow 90·span₂/1200; [12]+[12]: 0 hollow but needs… both full → 0.
+  // Make the stacked version illegal (no span 12 for card 1) so a hollow row is the only option.
+  const cards = [card({ 4: 100, 6: 100, 8: 100 }), card({ 4: 10, 6: 10, 8: 10, 12: 10 })];
+  const r = planRows(cards, { cols: 3, gap: 0, maxHollow: 0.01 });
+  assert.deepEqual(r.spans, [8, 4]);                           // 90·4 = 360 beats [4,8] (720) and [6,6] (540)
+  assert.equal(r.hollow, 0.3);
+});
+
 test('(f) equal height → the layout with less wasted area wins', () => {
   // [4,8] is enumerated first: heights (100,40), waste 60·8 = 480. [6,6]: heights (100,100), waste 0.
   // Both stack 100 high, so only the waste tie-break can prefer [6,6].

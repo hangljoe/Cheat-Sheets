@@ -14,6 +14,11 @@ export const FORMATS = {
 // No printed text may be smaller than this, whatever the format or auto-fit does.
 export const MIN_PT = 6;
 
+// A grid page may leave at most this share of its card area hollow (empty space under a card's
+// content, where rows stretch to the tallest card). The balancer plans within it and the build
+// prints `△ hollow` when the final page still exceeds it. Per sheet: `max_hollow:` in sheet.yaml.
+export const MAX_HOLLOW = 0.10;
+
 // Depth = how far the sheet goes. Budget = total cards the topic should get.
 export const DEPTHS = {
   1: { name: 'Glance', budget: 5, intent: 'The core idea and the handful of things you must never forget.' },
@@ -32,7 +37,12 @@ export function resolveLayout(meta) {
   if (!depth) throw new Error(`Depth must be 1-5, got "${meta.depth}".`);
   const fontPt = f.font * (meta.scale || 1);
   const minScale = Math.max(meta.min_scale ?? 0.86, MIN_PT / fontPt);
+  const maxHollow = meta.max_hollow ?? MAX_HOLLOW;
+  if (typeof maxHollow !== 'number' || !(maxHollow >= 0 && maxHollow <= 1)) {
+    throw new Error(`max_hollow must be a number from 0 to 1 (1 = shortest stack only), got "${meta.max_hollow}".`);
+  }
   return {
+    maxHollow,
     format: key,
     landscape,
     widthMm: landscape ? f.h : f.w,

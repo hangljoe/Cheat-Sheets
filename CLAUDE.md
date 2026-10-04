@@ -31,7 +31,8 @@ npm test                       # unit + fixture renders (node:test)
 ```
 
 Each build writes `report.json` next to its PDF (per page: scale, effectivePt, minTextPt, overflow, fill,
-balance, cards; plus figures and pagination). Exit codes — treat every non-zero as a failing test:
+hollow, balance, cards with slack; plus figures and pagination). `△ hollow` (over 10 % of card area empty)
+and `△ sparse` are warnings the `/cheatsheet` loop must fix, not exit codes. Exit codes — treat every non-zero as a failing test:
 1 = a build failed or the input is invalid · 2 = a page overflows, or a variant needs more pages than
 its `pages:` · 3 = text under 6 pt (`minTextAt` names it, incl. diagram labels) · 4 = a figure or the print sheet failed.
 `npm test` must stay green.

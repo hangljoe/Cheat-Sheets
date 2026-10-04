@@ -16,6 +16,9 @@ test('balance: the balancer picks spans so the page fits, in source order', () =
   // The measuring host must reproduce the real layout (fonts, --fig-max on the section and card, …).
   const err = Math.abs(p.balance.predictedPx - p.balance.actualPx) / p.balance.actualPx;
   assert.ok(err < 0.02, `predicted ${p.balance.predictedPx}px vs actual ${p.balance.actualPx}px`);
+  // Hollow space is reported per page and per card, as a share in [0, 1].
+  assert.ok(p.hollow >= 0 && p.hollow <= 1, `hollow ${p.hollow}`);
+  assert.ok(p.cards.every((c) => c.slack >= 0 && c.slack <= 1));
   assertReadable(report);
 });
 

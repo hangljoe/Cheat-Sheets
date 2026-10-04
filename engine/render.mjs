@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright';
 import { buildSheet, exitCodeFor, pageUnreadable, floorOverridden, readMeta, checkMeta, safeRemove, combineExitCodes } from './lib/build.mjs';
-import { MIN_PT } from './formats.mjs';
+import { MIN_PT, MAX_HOLLOW } from './formats.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // Options: booleans (--no-fit --no-png --open) and --print with an optional sheet (A3|A4).
@@ -114,14 +114,20 @@ function printReport(r) {
     const floorOff = floorOverridden(p);
     const tiny = pageUnreadable(p) && !floorOff;
     overridden ||= floorOff;
+    const hollow = (p.hollow ?? 0) > MAX_HOLLOW;
     const status = p.overflow ? '✗ OVERFLOW' : floorOff ? '✗ FLOOR OVERRIDDEN' : tiny ? `✗ TEXT < ${MIN_PT}pt`
-      : p.fill < 0.55 ? '△ sparse' : '✓ fits';
-    if (p.overflow || tiny || floorOff || p.fill < 0.55) problems++;
-    console.log(`  page ${p.page}: ${status}  fill ${(p.fill * 100).toFixed(0)}%  scale ${p.scale.toFixed(2)}` +
+      : p.fill < 0.55 ? '△ sparse' : hollow ? '△ hollow' : '✓ fits';
+    if (p.overflow || tiny || floorOff || p.fill < 0.55 || hollow) problems++;
+    const hollowCards = hollow
+      ? (p.cards ?? []).filter((c) => (c.slack ?? 0) > MAX_HOLLOW).map((c) => `${c.label} ${(c.slack * 100).toFixed(0)}%`)
+      : [];
+    console.log(`  page ${p.page}: ${status}  fill ${(p.fill * 100).toFixed(0)}%  hollow ${((p.hollow ?? 0) * 100).toFixed(0)}%` +
+      `  scale ${p.scale.toFixed(2)}` +
       (p.minTextPt === null ? '  no measurable text' : `  min text ${p.minTextPt.toFixed(1)} pt`) +
       (p.overflow ? `  → cut off: ${p.cut.join(' | ')}` : '') +
       (floorOff ? `  → sheet.css sets --min-text to ${p.minTextFloorPt} pt` : '') +
-      (tiny ? `  → smallest at ${p.minTextAt}` : ''));
+      (tiny ? `  → smallest at ${p.minTextAt}` : '') +
+      (hollowCards.length ? `  → empty space in: ${hollowCards.join(' | ')}` : ''));
   }
   if (r.requestedPages && r.auto && r.pages.length > r.requestedPages) {
     console.log(`  ✗ needs ${r.pages.length} pages (pages: ${r.requestedPages} in sheet.yaml) — trim, lower the depth, or allow more pages.`);

@@ -375,12 +375,14 @@ function planPage(page, body) {
   if (cards.length > MAX_BALANCE_CARDS) return { reason: 'too-many-cards' };  // before measuring
   const ctx = gridContext(page, body);
   const measured = measureCards(page, cards, ctx);
-  let plan = planRows(measured, { cols: ctx.cols, gap: ctx.gap });
+  // The stack must fit the page body; headroom under it counts as hollow (rows stretch to fill it).
+  const opts = { gap: ctx.gap, maxHollow: L.maxHollow, maxHeight: body.clientHeight };
+  let plan = planRows(measured, { cols: ctx.cols, ...opts });
   // Fixed spans the format's free widths can't complement: let free cards take any
   // width from 2 up (allowedSpans(6) = 2…12), measured on demand (cached).
   if (!plan) {
     const wide = { ...ctx, cols: 6 };
-    plan = planRows(measureCards(page, cards, wide), { cols: wide.cols, gap: ctx.gap });
+    plan = planRows(measureCards(page, cards, wide), { cols: wide.cols, ...opts });
   }
   if (!plan || plan.skipped) return { reason: plan?.skipped ?? 'no-partition' };
   return { cards, plan };
@@ -413,6 +415,24 @@ function inSourceOrder(body) {
 
 const stackHeight = (body, cards) =>
   Math.round(Math.max(...cards.map((c) => c.getBoundingClientRect().bottom)) - body.getBoundingClientRect().top);
+
+// Hollow space: the part of a card's box below its last child (rows are stretched to the tallest
+// card, so a short card next to a tall one ends in empty space). Measured on the final layout.
+// Per card: slack = hollow height / card height. Per page: hollow area / total card area.
+function hollowSpace(body) {
+  let hollow = 0, area = 0;
+  const slack = [...body.children].map((card) => {
+    const r = card.getBoundingClientRect();
+    if (!card.children.length || r.height <= 0) return 0;
+    const pad = parseFloat(getComputedStyle(card).paddingBottom) || 0;
+    const inner = Math.max(...[...card.children].map((k) => k.getBoundingClientRect().bottom)) - r.top + pad;
+    const empty = Math.max(0, r.height - inner);
+    hollow += empty * r.width;
+    area += r.height * r.width;
+    return +(empty / r.height).toFixed(3);
+  });
+  return { slack, hollow: area ? +(hollow / area).toFixed(3) : 0 };
+}
 
 window.__fitPages = (fit) => allPages().map((page, i) => {
   const body = page.querySelector('.page-body');
@@ -471,13 +491,15 @@ window.__fitPages = (fit) => allPages().map((page, i) => {
         .filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > box.bottom + 1 || r.right > box.right + 1; })
         .map(label)
     : [];
+  const { slack, hollow } = hollowSpace(body);
   // span null = the CSS default (span 4) — the balancer did not set one.
   const cards = [...body.children].map((el, index) => ({
     index, id: el.id || el.dataset.id || null, label: label(el),
     span: fixedSpan(el) ?? (Number(/span (\d+)/.exec(el.style.gridColumn)?.[1]) || null),
+    slack: slack[index],
   }));
   delete balance.changed;
-  return { page: i + 1, scale, effectivePt: +(L.fontPt * scale).toFixed(2), ...minText(page), overflow, fill, cut, balance, cards };
+  return { page: i + 1, scale, effectivePt: +(L.fontPt * scale).toFixed(2), ...minText(page), overflow, fill, hollow, cut, balance, cards };
 });
 
 // 5. Pagination (content mode): pour the cards of a section[data-auto] into as many
