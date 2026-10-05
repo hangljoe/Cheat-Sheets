@@ -1,0 +1,5 @@
+title: Variant gate
+icon: book-open
+variants:
+  a: { format: A6, depth: 1 }
+  b: { format: A6, depth: 1 }

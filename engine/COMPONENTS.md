@@ -22,6 +22,8 @@ column, smaller type and gaps, about 1.8× the content per page: a text-first re
 gaps, about half the content per page: a poster). Density is layout only; the content and its tiers are
 the same file. Pair `dense` with a deeper `depth`, `visual` with a shallower one.
 `data-tier="N"` (1–5) on any element (card, list item, table row, span) = the smallest depth that shows it.
+`data-variants="mono,poster"` on any element keeps it only in the named variants (for banner headings or
+prose that belong to one layout); elements without it appear everywhere.
 `pages:` is a limit — the engine first re-cuts at a smaller scale, and only fails (exit 2) if that
 doesn't help. Variant keys override the top-level ones (shallow merge). Variant names: letters,
 digits, `-`, `_`. `layout: flow` switches a variant to newspaper columns; `balance: false` turns the
@@ -70,6 +72,14 @@ Default columns: A3 4/6 · A4 3/4 · A5 2/3 · A6 1/2 · A7 1/2 (portrait/landsc
 Tone `t1`–`t6` sets the card's color (auto-cycles when omitted), `ink` for neutral.
 Variants: `solid` (filled color, white text), `tint` (light wash), `bare` (no box).
 `<h2><span class="num">01</span>Title</h2>` gives a numbered section instead of an icon.
+
+### Banner and spot art
+
+`<div class="card banner span-12"><h2>Team and Communication</h2></div>` is a full-width section heading
+between cards (no box, no icon; always with `span-12`). `<span class="spot"><i data-icon="ship"></i></span>`
+right after a card's `<h2>` is a large spot illustration (4.5 em); it renders only at `density: visual`.
+`class="center"` centres a block's text. Together with the `mono` theme this gives the black-and-white
+poster look of the Canva examples.
 
 ## Icons
 

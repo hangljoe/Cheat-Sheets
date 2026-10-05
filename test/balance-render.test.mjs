@@ -18,6 +18,7 @@ test('balance: the balancer picks spans so the page fits, in source order', () =
   assert.ok(err < 0.02, `predicted ${p.balance.predictedPx}px vs actual ${p.balance.actualPx}px`);
   // Hollow space is reported per page and per card, as a share in [0, 1].
   assert.ok(p.hollow >= 0 && p.hollow <= 1, `hollow ${p.hollow}`);
+  assert.ok(p.void >= 0 && p.void <= 1, `void ${p.void}`);
   assert.ok(p.cards.every((c) => c.slack >= 0 && c.slack <= 1));
   assertReadable(report);
 });

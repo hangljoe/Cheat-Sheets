@@ -1,6 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveLayout, MIN_PT } from '../engine/formats.mjs';
+import { resolveLayout, smallerFormat, MIN_PT } from '../engine/formats.mjs';
+
+test('smallerFormat names the DIN size the content would fill, never over-full', () => {
+  assert.deepEqual(smallerFormat('A4', 0.45), { format: 'A5', used: 0.9 });
+  assert.deepEqual(smallerFormat('A4', 0.2), { format: 'A6', used: 0.8 });
+  assert.equal(smallerFormat('A4', 0.7), null);          // A5 would be 140 %: stay on A4
+  assert.equal(smallerFormat('A7', 0.1), null);          // nothing smaller than A7
+  assert.deepEqual(smallerFormat('a3', 0.3), { format: 'A4', used: 0.6 });
+});
 
 test('A7 floor is raised so base text stays at 6 pt', () => {
   const l = resolveLayout({ format: 'A7', depth: 1 });

@@ -23,6 +23,12 @@ for (const el of document.querySelectorAll('[data-tier]')) {
   }
   if (Number(t) > L.depth) el.remove();
 }
+// 0b. Variant gate: data-variants="mono,poster" keeps an element only in the named variants
+// (e.g. banner headings that belong to one layout). Without variants nothing is gated.
+for (const el of document.querySelectorAll('[data-variants]')) {
+  const names = el.dataset.variants.split(',').map((s) => s.trim()).filter(Boolean);
+  if (meta.variant && names.length && !names.includes(meta.variant)) el.remove();
+}
 
 // 1. Page chrome: wrap content in .page-body, add header (page 1) and footer.
 function buildChrome(page, i) {
@@ -404,14 +410,50 @@ function balancePage(page, body) {
   const r = planPage(page, body);
   if (!r.plan) return { applied: false, reason: r.reason, ms: Math.round(performance.now() - t0) };
   const changed = applyPlan(body, r);
-  return { applied: true, changed, predictedPx: Math.round(r.plan.height), atScale: Number(page.style.getPropertyValue('--fit')),
-    ms: Math.round(performance.now() - t0), cards: r.cards };
+  return { applied: true, changed, predictedPx: Math.round(r.plan.height), plannedHollow: r.plan.hollow,
+    atScale: Number(page.style.getPropertyValue('--fit')), ms: Math.round(performance.now() - t0), cards: r.cards };
 }
 
 // Grid cards appear in source order when each starts at or after the previous (row-major).
 function inSourceOrder(body) {
   const r = [...body.children].filter((c) => getComputedStyle(c).display !== 'none').map((c) => c.getBoundingClientRect());
   return r.every((b, i) => !i || b.top > r[i - 1].top + 1 || (Math.abs(b.top - r[i - 1].top) <= 1 && b.left > r[i - 1].left));
+}
+
+// Void: empty regions big enough to notice. Rasterise the page body into 3 mm cells, mark the cells
+// touched by content (text line boxes, figures, icons, images, each padded by one cell), then count
+// every cell inside a fully empty 21 mm × 21 mm window. Gaps and padding stay under that size; hollow card bottoms, unused
+// width beside short lines and air around a small figure do not. Share of the page body area.
+function voidShare(page, body) {
+  const box = body.getBoundingClientRect();
+  if (!(box.width > 0 && box.height > 0)) return 0;
+  const pxPerMm = page.getBoundingClientRect().width / L.widthMm;
+  const cell = 3 * pxPerMm, win = 7, pad = 1;
+  const cols = Math.ceil(box.width / cell), rows = Math.ceil(box.height / cell);
+  const hit = new Uint8Array(cols * rows);
+  const mark = (r) => {
+    if (!(r.width > 0 && r.height > 0)) return;
+    const c0 = Math.max(0, Math.floor((r.left - box.left) / cell) - pad), c1 = Math.min(cols - 1, Math.floor((r.right - box.left - 0.01) / cell) + pad);
+    const r0 = Math.max(0, Math.floor((r.top - box.top) / cell) - pad), r1 = Math.min(rows - 1, Math.floor((r.bottom - box.top - 0.01) / cell) + pad);
+    for (let y = r0; y <= r1; y++) for (let x = c0; x <= c1; x++) hit[y * cols + x] = 1;
+  };
+  const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    if (!n.nodeValue.trim() || n.parentElement.closest('svg, script, style, [hidden]')) continue;
+    range.selectNodeContents(n);
+    for (const r of range.getClientRects()) mark(r);
+  }
+  for (const el of body.querySelectorAll('svg, img, canvas')) if (!el.parentElement.closest('svg')) mark(el.getBoundingClientRect());
+  const isVoid = new Uint8Array(cols * rows);
+  for (let y = 0; y + win <= rows; y++) for (let x = 0; x + win <= cols; x++) {
+    let empty = true;
+    for (let dy = 0; dy < win && empty; dy++) for (let dx = 0; dx < win; dx++) if (hit[(y + dy) * cols + x + dx]) { empty = false; break; }
+    if (empty) for (let dy = 0; dy < win; dy++) for (let dx = 0; dx < win; dx++) isVoid[(y + dy) * cols + x + dx] = 1;
+  }
+  let v = 0;
+  for (let i = 0; i < isVoid.length; i++) v += isVoid[i];
+  return +(v / (cols * rows)).toFixed(3);
 }
 
 const stackHeight = (body, cards) =>
@@ -477,6 +519,28 @@ window.__fitPages = (fit) => allPages().map((page, i) => {
       }
     }
   }
+  // Hollow check: growing the type into a layout with half-empty cards is a bad trade. If the page
+  // ends over the cap, step the type down (at most 5 steps of 0.02, never below the floor) and keep the
+  // first scale whose layout is under the cap, or the least hollow one seen; otherwise stay put.
+  const hollowNow = (b) => {
+    const { hollow } = hollowSpace(body);
+    const slack = b.applied && b.cards ? Math.max(0, body.clientHeight - stackHeight(body, b.cards)) / body.clientHeight : 0;
+    return hollow + (1 - hollow) * slack;
+  };
+  if (fit && balance.applied && !overflowing(body) && hollowNow(balance) > L.maxHollow + 1e-9) {
+    const start = scale;
+    let best = { scale, hollow: hollowNow(balance), balance };
+    for (let s = +(start - 0.02).toFixed(2); s >= Math.max(L.minScale, start - 0.1) - 1e-9; s = +(s - 0.02).toFixed(2)) {
+      set(scale = s);
+      const b = balancePage(page, body);
+      if (!b.applied || overflowing(body)) continue;
+      const h = hollowNow(b);
+      if (h < best.hollow - 1e-6) best = { scale: s, hollow: h, balance: { ...b, ms: balance.ms + b.ms, stepped: +(start - s).toFixed(2) } };
+      if (h <= L.maxHollow + 1e-9) break;
+    }
+    if (best.scale !== scale) { set(scale = best.scale); balancePage(page, body); }
+    balance = best.balance;
+  }
   const overflow = overflowing(body);
   const fill = fillRatio(body);
   if (balance.applied) {
@@ -493,6 +557,7 @@ window.__fitPages = (fit) => allPages().map((page, i) => {
         .map(label)
     : [];
   const { slack, hollow } = hollowSpace(body);
+  const voidPct = voidShare(page, body);
   // span null = the CSS default (span 4) — the balancer did not set one.
   const cards = [...body.children].map((el, index) => ({
     index, id: el.id || el.dataset.id || null, label: label(el),
@@ -500,7 +565,7 @@ window.__fitPages = (fit) => allPages().map((page, i) => {
     slack: slack[index],
   }));
   delete balance.changed;
-  return { page: i + 1, scale, effectivePt: +(L.fontPt * scale).toFixed(2), ...minText(page), overflow, fill, hollow, cut, balance, cards };
+  return { page: i + 1, scale, effectivePt: +(L.fontPt * scale).toFixed(2), ...minText(page), overflow, fill, hollow, void: voidPct, cut, balance, cards };
 });
 
 // 5. Pagination (content mode): pour the cards of a section[data-auto] into as many
@@ -538,11 +603,19 @@ function pour(source, cards, scale) {
     body.appendChild(card);
     if (full() && body.children.length > 1) {
       card.remove();
+      // A banner (section heading) never ends a page: it travels with the card after it.
+      const carry = [];
+      while (body.children.length > 1 && body.lastElementChild.classList.contains('banner')) {
+        const b = body.lastElementChild;
+        b.remove();
+        carry.unshift(b);
+      }
       if (grid()) { const r = planPage(page, body); if (r.plan) applyPlan(body, r); }
       page = newPageAfter(source, page);
       page.dataset.autoPage = '1';
       body = page.querySelector('.page-body');
       setup(page);
+      for (const b of carry) body.appendChild(b);
       body.appendChild(card);
       full();   // a card that overflows an empty page stays; __fitPages reports it
     }

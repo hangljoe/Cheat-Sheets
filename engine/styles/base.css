@@ -305,3 +305,15 @@ section.page[data-density="visual"] .big { font-size: 2em; }
 section.page[data-density="visual"] .stat b { font-size: 3em; }
 section.page[data-density="visual"] .vs { gap: 0.7em; }
 section.page[data-density="visual"] .vs > * { padding: 0.7em 0.8em; }
+
+/* ---------- banners, spot art, centred text ---------- */
+/* A banner is a full-width section heading between cards (always pair it with span-12 so the
+   balancer knows its width). Spot art is a large icon under a card heading, shown at visual density. */
+.card.banner { background: none; border: none; box-shadow: none; padding: 0.5em 0 0.1em; align-items: center; }
+section.page .card.banner > h2 { font-size: 2.4em; justify-content: center; text-align: center; letter-spacing: -0.02em; color: var(--ink); }
+section.page .card.banner > h2 svg.icon { display: none; }
+section.page[data-density="visual"] .tiles { grid-template-columns: repeat(auto-fit, minmax(8em, 1fr)); }
+.spot { display: block; align-self: center; width: 4.5em; height: 4.5em; color: var(--tone, var(--ink)); }
+.spot svg.icon { width: 100%; height: 100%; stroke-width: 1.3; vertical-align: 0; }
+section.page:not([data-density="visual"]) .spot { display: none; }
+.center { text-align: center; }

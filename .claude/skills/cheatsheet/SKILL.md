@@ -18,7 +18,7 @@ itself is unclear. State assumptions in one line and go.
 | orientation | `landscape` for A3–A5, `portrait` for A6–A7 | |
 | depth | `3` | 1 Glance · 2 Essentials · 3 Working · 4 Deep · 5 Reference |
 | pages | suggested by `engine/formats.mjs` (depth budget ÷ format capacity) | User's number wins; then scale content to fit it |
-| theme | `studio` | `studio` (clean, print) · `sketch` (hand-drawn) · `midnight` (dark, screen) · `handbook` (PreSales Handbook brand: navy + yellow, hairline cards) |
+| theme | `studio` | `studio` (clean, print) · `sketch` (hand-drawn) · `midnight` (dark, screen) · `handbook` (PreSales Handbook brand: navy + yellow, hairline cards) · `mono` (black-and-white poster, no boxes; use with `density: visual`, portrait, banners and spot art) |
 | density | `balanced` | `dense` (text-first reference card: no boxes, 5 columns on A4, ~1.8× content) · `balanced` (cards + icons + a diagram) · `visual` (poster: few items, big icons, ~½ content). "Compress", "text-heavy", "as much as possible" → `dense`; "visual", "poster", "big icons" → `visual` |
 | language | the user's language | set `lang:` in sheet.yaml |
 
@@ -82,6 +82,12 @@ Visual rules:
   diagram). Never hand-tune every card.
 - Grid layout for ≤ 10 sections per page (poster feel); `layout: flow` for dense
   reference pages (depth 4–5).
+- The **mono poster** recipe (like `examples/presales-handbook/Extreme Ownership by Johannes.pdf`):
+  `theme: mono, density: visual, orientation: portrait, columns: 3, pages: 2`; a `card banner span-12`
+  every 3–4 cards with a two-word section title; a `<span class="spot">` icon under most headings
+  (Lucide line icons stand in for clip art; for real illustrations drop PNGs into `assets/` and use
+  `<figure><img>`); full sentences are allowed here, centred; close with a card of phrases to say.
+  Banners carry `data-variants="<name>"` so the other variants of the same sheet don't inherit them.
 - Density changes what you write, not only how it is set. `dense`: lookup shapes (`kv`, tables,
   tight `checks`, `cols-2`), a tier-4 depth, one small diagram at most, no tiles or stats. `visual`:
   every card leads with an icon or a diagram, `tiles`, `stats`, `p.big` and callouts carry the page,
@@ -115,6 +121,13 @@ Read every `page-N.png` and judge it as a designer would:
 - exit 3 / `✗ TEXT < 6pt` → enlarge the offending text (`minTextAt` in report.json names it). Custom
   `sheet.css` must never shrink text or `::before/::after` content below 6 pt; that content isn't measured.
 - `△ sparse` → add the next-ranked items from notes.md (lower their tier), or enlarge the diagram.
+- `△ void` (over 10 % of the page is empty regions of about 20 mm or more, after fitting and balancing; the
+  line says how much of the page carries content and which smaller format would fill) → the engine has
+  done what it can; this is a content or page-size decision. First add content: lower the tier of the
+  next-ranked items in notes.md, lengthen fragments into full lines in wide cards, use `cols-2`/`cols-3`.
+  If the topic has nothing more worth adding, ask the user one question with the number from the
+  line: "The content fills about N % of the A4; print it as A5 (~M % used), or keep A4 and add …?"
+  Never ship a page over 10 % void without that question.
 - `△ hollow` (over 10 % of card area empty; the line names the cards) → the named cards are short next
   to tall neighbours: add their next-ranked items, merge two short cards into one, or trim the tall
   neighbour. In cards wider than 4 columns use blocks that stretch (tables, callouts, tiles, `.vs`,

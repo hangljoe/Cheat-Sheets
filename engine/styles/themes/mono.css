@@ -1,0 +1,32 @@
+/* mono — black-and-white print: no boxes, bold centred headings, banner sections, spot icons,
+   grey-scale figures. The look of the Canva sheets in examples/presales-handbook (Extreme Ownership
+   by Johannes, TOC + BBiT). Pair with density: visual, portrait, and banners every 3–4 cards. */
+:root {
+  --paper: #ffffff; --ink: #111111; --ink-2: #444444; --line: #111111; --card: transparent;
+  --code-bg: #111111; --code-ink: #ffffff;
+  --t1: #111111; --t2: #111111; --t3: #111111; --t4: #111111; --t5: #111111; --t6: #111111;
+  --accent: #111111; --radius: 0; --card-border: none; --shadow: none;
+}
+.sheet-head { border-bottom: 0.25em solid var(--ink); }
+.head-icon { background: var(--ink); color: #fff; border-radius: 0.3em; }
+.chip { background: #ececec; color: var(--ink); }
+.chip.depth { background: var(--ink); color: #fff; }
+.card { padding: 0.3em 0.25em; }
+.card > h2 { text-transform: uppercase; letter-spacing: 0.03em; justify-content: center; text-align: center; color: var(--ink); }
+.card > h2 svg.icon { background: none; color: var(--ink); padding: 0; width: 1.4em; height: 1.4em; }
+.card.tint, .card.solid { background: #f1f1f1; color: var(--ink); padding: 0.6em 0.7em; }
+.card.solid > h2 { color: var(--ink); }
+section.page .card.banner > h2 { text-transform: none; font-size: 2.8em; letter-spacing: -0.02em; }
+.card > p, .card > .big { text-align: center; }
+.big em { color: var(--ink); text-decoration: underline; text-decoration-thickness: 0.08em; text-underline-offset: 0.12em; }
+.callout { background: #f1f1f1; border-left-color: var(--ink); border-radius: 0; }
+.callout b:first-child { color: var(--ink); }
+.tiles > * { background: none; border: 1.5px solid var(--ink); border-radius: 0; }
+.vs > * { background: #f1f1f1; border-radius: 0; }
+.vs h4, h4 { color: var(--ink); }
+code { background: #ececec; color: var(--ink); }
+th { color: var(--ink); border-bottom-color: var(--ink); }
+tbody tr:nth-child(even) td { background: #f4f4f4; }
+ol.steps > li::before { background: var(--ink); color: #fff; }
+.excalidraw-svg, figure img { filter: grayscale(1) contrast(1.15); }
+.sheet-foot { border-top: 1px solid var(--ink); }

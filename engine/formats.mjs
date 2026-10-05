@@ -28,6 +28,16 @@ export const DEPTHS = {
   5: { name: 'Reference', budget: 80, intent: 'Near-exhaustive: everything a practitioner looks up.' },
 };
 
+// Which smaller DIN format the content would fill: each step halves the page, so a page whose
+// content covers `used` of it would cover 2·used of the next size down. Returns the smallest format
+// that stays ≤ 92 % used (never over-full), or null when the page is already well used.
+export function smallerFormat(format, used) {
+  const order = ['A3', 'A4', 'A5', 'A6', 'A7'];
+  let i = order.indexOf(String(format).toUpperCase()), u = used, pick = null;
+  while (i >= 0 && i < order.length - 1 && u * 2 <= 0.92) { i++; u *= 2; pick = { format: order[i], used: +u.toFixed(2) }; }
+  return pick;
+}
+
 // Density = how much air the page gets. `dense` packs text like a reference card (no card boxes,
 // one more column, smaller type, tighter gaps); `visual` is poster-like (one column fewer, bigger type
 // and icons, wider gaps, few items). cols is added to the format's default (never below 1);

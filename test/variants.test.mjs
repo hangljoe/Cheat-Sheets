@@ -20,6 +20,12 @@ test('one content.html builds every variant; depth filters cards and nested rows
   for (const v of ['small', 'big']) assertReadable(reports[v]);
 });
 
+test('data-variants keeps an element only in the named variants', () => {
+  const { reports } = buildAll('variant-only');
+  assert.deepEqual(ids(reports.a), ['c1', 'c2']);
+  assert.deepEqual(ids(reports.b), ['c1', 'c3']);
+});
+
 test('pagination respects pages:, numbers footers, and carries page_style to every page', () => {
   const { reports, outDir } = buildAll('topic');
   const tight = reports.tight;
