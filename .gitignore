@@ -3,4 +3,5 @@ out/
 inbox/*
 !inbox/README.md
 engine/vendor/
+examples/**/*.pptx
 .DS_Store

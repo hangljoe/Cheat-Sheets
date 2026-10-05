@@ -1,0 +1,20 @@
+/* handbook — PreSales Handbook brand: navy ink, yellow accent, white paper, hairline cards.
+   Derived from examples/presales-handbook (2024 text sheets: navy + yellow; 2026 PIV sheet: white
+   cards with thin borders and one muted tone per card). */
+:root {
+  --paper: #ffffff; --ink: #14213d; --ink-2: #5a6478; --line: #d9dde5; --card: #ffffff;
+  --code-bg: #14213d; --code-ink: #f4f6fb;
+  --t1: #1e5b67; --t2: #8e7029; --t3: #517222; --t4: #6e2aa8; --t5: #c9971c; --t6: #b3261e;
+  --accent: #f5c242;
+  --radius: 0.45em; --card-border: 1px solid var(--line); --shadow: none;
+}
+.sheet-head { border-bottom: 0.18em solid var(--accent); }
+.sheet-head h1 { color: var(--ink); }
+.head-icon { background: var(--accent); color: var(--ink); }
+.chip.depth { background: var(--ink); }
+.card > h2 svg.icon { background: color-mix(in oklab, var(--tone) 12%, white); color: var(--tone); }
+.card > h2 .num { background: var(--accent); color: var(--ink); }
+.callout.warn, .callout.key { background: color-mix(in oklab, var(--accent) 22%, white); --c: var(--t5); }
+.tiles > * { background: color-mix(in oklab, var(--tone, var(--t1)) 7%, white); }
+th { letter-spacing: 0.08em; }
+section.page[data-density="dense"] .card > h2 { color: var(--ink); border-bottom-color: var(--ink); }
