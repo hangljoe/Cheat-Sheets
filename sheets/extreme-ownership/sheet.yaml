@@ -7,4 +7,5 @@ source: "Willink & Babin, Extreme Ownership (2015)"
 variants:
   desk: { format: A4, orientation: landscape, depth: 3, theme: studio, pages: 1 }
   dense: { format: A4, orientation: landscape, depth: 4, theme: handbook, density: dense, pages: 1 }
-  visual: { format: A4, orientation: landscape, depth: 1, theme: handbook, density: visual, pages: 1 }
+  visual: { format: A5, orientation: landscape, depth: 1, theme: handbook, density: visual, pages: 1, min_scale: 0.78 }
+  mono: { format: A4, orientation: portrait, depth: 4, theme: mono, density: visual, columns: 3, pages: 2, scale: 0.9, subtitle: "by Jocko Willink · Leif Babin" }
