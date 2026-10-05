@@ -28,6 +28,16 @@ export const DEPTHS = {
   5: { name: 'Reference', budget: 80, intent: 'Near-exhaustive: everything a practitioner looks up.' },
 };
 
+// Density = how much air the page gets. `dense` packs text like a reference card (no card boxes,
+// one more column, smaller type, tighter gaps); `visual` is poster-like (one column fewer, bigger type
+// and icons, wider gaps, few items). cols is added to the format's default (never below 1);
+// font and gap multiply; capacity multiplies the cards a page is assumed to hold.
+export const DENSITIES = {
+  dense: { name: 'Dense', cols: 1, font: 0.9, gap: 0.6, capacity: 1.8, intent: 'As much as fits, still readable: a text-first reference card.' },
+  balanced: { name: 'Balanced', cols: 0, font: 1, gap: 1, capacity: 1, intent: 'Cards, icons and one diagram per page: the default mix.' },
+  visual: { name: 'Visual', cols: -1, font: 1.1, gap: 1.3, capacity: 0.55, intent: 'Few items, big icons, lots of air: a poster.' },
+};
+
 export function resolveLayout(meta) {
   const key = String(meta.format || 'A4').toUpperCase();
   const f = FORMATS[key];
@@ -35,7 +45,10 @@ export function resolveLayout(meta) {
   const landscape = (meta.orientation || (['A6', 'A7'].includes(key) ? 'portrait' : 'landscape')) === 'landscape';
   const depth = DEPTHS[meta.depth || 3];
   if (!depth) throw new Error(`Depth must be 1-5, got "${meta.depth}".`);
-  const fontPt = f.font * (meta.scale || 1);
+  const densityKey = String(meta.density || 'balanced').toLowerCase();
+  const d = DENSITIES[densityKey];
+  if (!d) throw new Error(`Unknown density "${meta.density}". Use one of ${Object.keys(DENSITIES).join(', ')}.`);
+  const fontPt = f.font * d.font * (meta.scale || 1);
   const minScale = Math.max(meta.min_scale ?? 0.86, MIN_PT / fontPt);
   const maxHollow = meta.max_hollow ?? MAX_HOLLOW;
   if (typeof maxHollow !== 'number' || !(maxHollow >= 0 && maxHollow <= 1)) {
@@ -47,15 +60,17 @@ export function resolveLayout(meta) {
     landscape,
     widthMm: landscape ? f.h : f.w,
     heightMm: landscape ? f.w : f.h,
-    cols: meta.columns && meta.columns !== 'auto' ? Number(meta.columns) : f.cols[landscape ? 1 : 0],
+    cols: meta.columns && meta.columns !== 'auto' ? Number(meta.columns) : Math.max(1, f.cols[landscape ? 1 : 0] + d.cols),
     fontPt,
     minScale,
     maxScale: Math.max(meta.max_scale ?? 1.25, minScale),
     marginMm: f.margin,
-    gapMm: f.gap,
-    capacity: f.capacity,
+    gapMm: +(f.gap * d.gap).toFixed(2),
+    capacity: Math.round(f.capacity * d.capacity),
+    density: densityKey,
+    densityName: d.name,
     depth: Number(meta.depth || 3),
     depthName: depth.name,
-    suggestedPages: Math.max(1, Math.ceil(depth.budget / f.capacity)),
+    suggestedPages: Math.max(1, Math.ceil(depth.budget / Math.max(1, f.capacity * d.capacity))),
   };
 }

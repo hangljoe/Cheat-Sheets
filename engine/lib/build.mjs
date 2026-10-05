@@ -174,7 +174,7 @@ export async function buildSheet({ root, sheetDir, outDir, name, meta: metaIn, h
 
     const report = {
       title: meta.title, format: layout.format, landscape: layout.landscape, depth: layout.depth,
-      depthName: layout.depthName, theme, basePt: layout.fontPt, minScale: layout.minScale,
+      depthName: layout.depthName, density: layout.density, theme, basePt: layout.fontPt, minScale: layout.minScale,
       requestedPages: meta.pages ? Number(meta.pages) : null, auto, variant: meta.variant ?? null,
       paginateScale: pagination?.scale ?? null, tierErrors,
       pages, figures, iconsMissing: [...new Set(missing)],

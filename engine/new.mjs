@@ -2,7 +2,8 @@
 // Scaffold a sheet folder.
 //
 //   npm run new -- <slug> [--title "..."] [--format A5] [--orientation portrait] [--depth 2]
-//                         [--pages 1] [--theme sketch] [--icon book-open] [--variant main] [--pages-mode]
+//                         [--pages 1] [--theme sketch] [--density dense|balanced|visual] [--icon book-open]
+//                         [--variant main] [--pages-mode]
 //
 // Default: content mode — content.html (a flat list of cards, paginated automatically)
 // plus a `variants:` block in sheet.yaml; add more formats as more lines there.
@@ -30,6 +31,7 @@ const variant = {
   orientation: opt.orientation || (['A6', 'A7'].includes(format) ? 'portrait' : 'landscape'),
   depth: Number(opt.depth || 3),
   theme: opt.theme || 'studio',
+  ...(opt.density ? { density: opt.density } : {}),
 };
 const layout = resolveLayout(variant);
 const pages = Number(opt.pages || layout.suggestedPages);
@@ -71,4 +73,4 @@ if (opt['pages-mode']) {
 `);
 }
 console.log(`Created sheets/${slug}/ — ${opt['pages-mode'] ? 'explicit pages' : 'content mode'}, ${format} ${variant.orientation}, ` +
-  `depth ${variant.depth} (${layout.depthName}), ${pages} page(s), ${layout.cols} columns, theme ${variant.theme}.`);
+  `depth ${variant.depth} (${layout.depthName}), ${layout.densityName.toLowerCase()}, ${pages} page(s), ${layout.cols} columns, theme ${variant.theme}.`);

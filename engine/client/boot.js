@@ -27,6 +27,7 @@ for (const el of document.querySelectorAll('[data-tier]')) {
 // 1. Page chrome: wrap content in .page-body, add header (page 1) and footer.
 function buildChrome(page, i) {
   const layout = page.dataset.layout || meta.layout_mode || 'flow';
+  if (!page.dataset.density) page.dataset.density = L.density || 'balanced';   // CSS keys off it
   const body = document.createElement('div');
   body.className = `page-body layout-${layout}`;
   if (page.dataset.cols) body.style.setProperty('--cols', page.dataset.cols);

@@ -18,7 +18,8 @@ itself is unclear. State assumptions in one line and go.
 | orientation | `landscape` for A3–A5, `portrait` for A6–A7 | |
 | depth | `3` | 1 Glance · 2 Essentials · 3 Working · 4 Deep · 5 Reference |
 | pages | suggested by `engine/formats.mjs` (depth budget ÷ format capacity) | User's number wins; then scale content to fit it |
-| theme | `studio` | `studio` (clean, print) · `sketch` (hand-drawn) · `midnight` (dark, screen) · or a theme derived from `examples/` |
+| theme | `studio` | `studio` (clean, print) · `sketch` (hand-drawn) · `midnight` (dark, screen) · `handbook` (PreSales Handbook brand: navy + yellow, hairline cards) |
+| density | `balanced` | `dense` (text-first reference card: no boxes, 5 columns on A4, ~1.8× content) · `balanced` (cards + icons + a diagram) · `visual` (poster: few items, big icons, ~½ content). "Compress", "text-heavy", "as much as possible" → `dense`; "visual", "poster", "big icons" → `visual` |
 | language | the user's language | set `lang:` in sheet.yaml |
 
 "How deep" maps to depth; "more pages" means more depth at the same density, never
@@ -81,11 +82,15 @@ Visual rules:
   diagram). Never hand-tune every card.
 - Grid layout for ≤ 10 sections per page (poster feel); `layout: flow` for dense
   reference pages (depth 4–5).
+- Density changes what you write, not only how it is set. `dense`: lookup shapes (`kv`, tables,
+  tight `checks`, `cols-2`), a tier-4 depth, one small diagram at most, no tiles or stats. `visual`:
+  every card leads with an icon or a diagram, `tiles`, `stats`, `p.big` and callouts carry the page,
+  ≤ 6 words per line, depth 1–2, one idea per card.
 
 ## 4. Build
 
 ```bash
-npm run new -- <slug> --format A4 --depth 3 --theme studio --title "…" --icon <lucide>
+npm run new -- <slug> --format A4 --depth 3 --theme studio [--density dense|visual] --title "…" --icon <lucide>
 # write sheets/<slug>/content.html (+ diagrams/*.mjs → node them → *.excalidraw)
 npm run build -- <slug>            # every variant in sheet.yaml → out/<slug>/<variant>/
 npm run build -- <slug>:pocket     # just one

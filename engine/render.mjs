@@ -108,7 +108,7 @@ function printReport(r) {
       : `⚠ figure ${w.src}: unsupported parts dropped (${w.skipped.join(', ')})`);
   }
   console.log(`\n${r.title}${r.variant ? ` [${r.variant}]` : ''} — ${r.format} ${r.landscape ? 'landscape' : 'portrait'}, ` +
-    `depth ${r.depth} (${r.depthName}), theme ${r.theme}, ${r.pages.length} page(s)`);
+    `depth ${r.depth} (${r.depthName}), ${r.density && r.density !== 'balanced' ? `${r.density}, ` : ''}theme ${r.theme}, ${r.pages.length} page(s)`);
   let problems = (r.figures?.errors?.length ?? 0) + r.iconsMissing.length, overridden = false;
   for (const p of r.pages) {
     const floorOff = floorOverridden(p);

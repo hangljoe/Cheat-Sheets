@@ -25,7 +25,7 @@ material; Claude extracts what matters and renders DIN A3–A7 PDFs.
 ## Commands
 
 ```bash
-npm run new -- <slug> [--format A5] [--orientation portrait] [--depth 2] [--theme sketch] [--title "…"] [--icon book] [--pages-mode]
+npm run new -- <slug> [--format A5] [--orientation portrait] [--depth 2] [--theme sketch] [--density dense|visual] [--title "…"] [--icon book] [--pages-mode]
 npm run build -- <slug>[:variant] [--open] [--no-fit] [--no-png] [--print [A4|A3]]
 npm test                       # unit + fixture renders (node:test)
 ```

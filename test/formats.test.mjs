@@ -9,6 +9,23 @@ test('A7 floor is raised so base text stays at 6 pt', () => {
   assert.equal(l.maxScale, 1.25);
 });
 
+test('density shifts columns, type, gaps and capacity; balanced is the default', () => {
+  const b = resolveLayout({ format: 'A4', depth: 3 });
+  const d = resolveLayout({ format: 'A4', depth: 3, density: 'dense' });
+  const v = resolveLayout({ format: 'A4', depth: 3, density: 'visual' });
+  assert.equal(b.density, 'balanced');
+  assert.deepEqual([b.cols, d.cols, v.cols], [4, 5, 3]);
+  assert.ok(d.fontPt < b.fontPt && v.fontPt > b.fontPt);
+  assert.ok(d.gapMm < b.gapMm && v.gapMm > b.gapMm);
+  assert.ok(d.capacity > b.capacity && v.capacity < b.capacity);
+  assert.ok(d.suggestedPages <= b.suggestedPages && v.suggestedPages >= b.suggestedPages);
+  // dense never pushes the floor below 6 pt: minScale rises with the smaller base size
+  assert.ok(d.minScale * d.fontPt >= MIN_PT - 1e-9);
+  // columns never drop below 1
+  assert.equal(resolveLayout({ format: 'A7', depth: 1, density: 'visual' }).cols, 1);
+  assert.throws(() => resolveLayout({ format: 'A4', density: 'sparse' }), /Unknown density/);
+});
+
 test('A4 keeps the 0.86 floor (6/7.6 is lower)', () => {
   assert.equal(resolveLayout({ format: 'A4', depth: 3 }).minScale, 0.86);
 });

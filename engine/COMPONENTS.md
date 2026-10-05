@@ -16,6 +16,11 @@ variants:
   pocket: { format: A7, depth: 1, theme: sketch, title: Git in 60s, pages: 1 }
 ```
 
+`density:` (top level or per variant) sets how much air the page gets: `dense` (no card boxes, one more
+column, smaller type and gaps, about 1.8× the content per page: a text-first reference card), `balanced`
+(the default: cards, icons, one diagram per page) or `visual` (one column fewer, bigger type, icons and
+gaps, about half the content per page: a poster). Density is layout only; the content and its tiers are
+the same file. Pair `dense` with a deeper `depth`, `visual` with a shallower one.
 `data-tier="N"` (1–5) on any element (card, list item, table row, span) = the smallest depth that shows it.
 `pages:` is a limit — the engine first re-cuts at a smaller scale, and only fails (exit 2) if that
 doesn't help. Variant keys override the top-level ones (shallow merge). Variant names: letters,
